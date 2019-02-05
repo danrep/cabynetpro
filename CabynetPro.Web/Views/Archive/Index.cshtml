@@ -1,0 +1,93 @@
+﻿@using System.Globalization
+@using System.Web.Hosting
+
+@{
+    ViewBag.Title = "Data Archive Overview";
+    ViewBag.TitleDesc = "Space Used, Number of Files and more";
+    Layout = "~/Views/Shared/_ApplicationLayout.cshtml";
+
+    var entites = new Entities();
+    var totalFiles = entites.FileInformations.Where(x => !x.IsDeleted);
+
+    var thisMonthStart = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    var thisMonthEnd = thisMonthStart.AddMonths(1);
+    var thisDayStart = DateTime.Today;
+    var thisDayEnd = DateTime.Today.AddDays(1);
+
+    var totalFilesToday = totalFiles.Where(x => x.DateCreated > thisDayStart && x.DateCreated < thisDayEnd).ToList();
+    var totalFilesThisMonth = totalFiles.Where(x => x.DateCreated > thisMonthStart && x.DateCreated < thisMonthEnd).ToList();
+
+    var pendingOperationDirectoryInfo = new DirectoryInfo($"{HostingEnvironment.ApplicationPhysicalPath}\\CabynetProDataArchive\\Prep");
+    var archiveOperationDirectoryInfo = new DirectoryInfo($"{HostingEnvironment.ApplicationPhysicalPath}\\CabynetProDataArchive\\Archive");
+}
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="widget widget-default widget-carousel">
+            <div class="owl-carousel" id="owl-example">
+                <div>
+                    <div class="widget-title">Total Files</div>
+                    <div class="widget-subtitle">@((totalFiles.Sum(x => x.FileSize) / 1000000).ToString("#,##0.00")) MB</div>
+                    <div class="widget-int">@totalFiles.Count()</div>
+                </div>
+                <div>
+                    <div class="widget-title">This Month of @DateTime.Now.ToString("MMMM yyyy")</div>
+                    <div class="widget-subtitle">@((totalFilesThisMonth.Sum(x => x.FileSize) / 1000000).ToString("#,##0.00")) MB</div>
+                    <div class="widget-int">@totalFilesThisMonth.Count()</div>
+                </div>
+                <div>
+                    <div class="widget-title">For Today</div>
+                    <div class="widget-subtitle">@((totalFilesToday.Sum(x => x.FileSize) / 1000000).ToString("#,##0.00")) MB</div>
+                    <div class="widget-int">@totalFilesToday.Count()</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="widget widget-warning widget-item-icon" onclick="location.href='#';">
+            <div class="widget-item-left">
+                <span class="fa fa-files-o"></span>
+            </div>
+            <div class="widget-data">
+                <div class="widget-int num-count">@pendingOperationDirectoryInfo.EnumerateFiles().Count().ToString("#,##0")</div>
+                <div class="widget-title">Unprocessed but Upoaded</div>
+                @if (pendingOperationDirectoryInfo.EnumerateFiles().Any())
+                {
+                    <div class="widget-subtitle">as far back as @(pendingOperationDirectoryInfo.EnumerateFiles().OrderByDescending(x => x.CreationTime).FirstOrDefault()?.CreationTime.ToString(CultureInfo.InvariantCulture))</div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="widget widget-info widget-item-icon" onclick="location.href='#';">
+            <div class="widget-item-left">
+                <span class="fa fa-user"></span>
+            </div>
+            <div class="widget-data">
+                <div class="widget-int num-count">@archiveOperationDirectoryInfo.EnumerateFiles().Count().ToString("#,##0")</div>
+                <div class="widget-title">Archived</div>
+                @if (archiveOperationDirectoryInfo.EnumerateFiles().Any())
+                {
+                    <div class="widget-subtitle">as far back as @(archiveOperationDirectoryInfo.EnumerateFiles().OrderByDescending(x => x.CreationTime).FirstOrDefault()?.CreationTime.ToString(CultureInfo.InvariantCulture))</div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="widget widget-danger widget-padding-sm">
+            <div class="widget-big-int plugin-clock">00:00</div>
+            <div class="widget-subtitle plugin-date">Loading...</div>
+            <div class="widget-buttons widget-c3">
+                <div class="col">
+                    <a href="#"><span class="fa fa-clock-o"></span></a>
+                </div>
+                <div class="col">
+                    <a href="#"><span class="fa fa-bell"></span></a>
+                </div>
+                <div class="col">
+                    <a href="#"><span class="fa fa-calendar"></span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

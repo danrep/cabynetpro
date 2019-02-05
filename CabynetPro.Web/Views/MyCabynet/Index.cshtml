@@ -1,0 +1,111 @@
+﻿
+@{
+    ViewBag.Title = "Welcome to Cabynet Pro";
+    ViewBag.TitleDesc = "An Overwiew of your personal Cabynet";
+    Layout = "~/Views/Shared/_ApplicationLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="input-group input-group-lg">
+            <span class="input-group-addon"><span class="fa fa-search"></span></span>
+            <input type="text" class="form-control" placeholder="What are you searching for?" ng-change="quickSearch()" ng-model="query" />
+        </div>
+    </div>
+    <div class="col-md-12" style="margin-top: 5px">
+        <span class="badge badge-success" ng-if="searchResults.length != 0">Showing {{searchResults.length}} result(s)</span>
+    </div>
+</div>
+<hr/>
+<div class="row" ng-if="searchResults.length != 0">
+    <div class="col-md-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Search Results</h3>
+            </div>
+            <div class="panel-body list-group list-group-contacts">
+                <a class="list-group-item" ng-repeat="searchResult in searchResults track by $index" ng-click="loadResult(searchResult)">
+                    <div class="list-group-status status-online"></div>
+                    <i class="fa fa-2x fa-file-pdf-o"></i>
+                    <span class="contacts-title">
+                        {{searchResult.FileNameSource}}
+                    </span>
+                    <p>Size: {{(searchResult.FileSize / 1000000) | number:2}} Mb</p>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8" ng-if="searchResult">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">Selected Search Result: {{searchResult.FileNameSource}}</h3>
+            </div>
+            <div class="panel-body">
+                <h5>File Information</h5>
+                <hr />
+                <p><label>Original File Name:</label> <span id="lblFileNameSource">{{searchResult.FileNameSource}}</span></p>
+                <p><strong>Description:</strong> <span id="lblFileNameDescription">{{searchResult.FileNameDescription}}</span></p>
+                <a class="btn btn-xs btn-warning" data-toggle="modal" data-target="#pdfModal" ng-click="loadFile(searchResult)">
+                    Click here to view
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@RenderPage("../Shared/ModalPdfView.cshtml")
+
+@section Scripts{
+    <script>
+        cabynet.controller('cabynetCtrlr',
+            function($scope) {
+                $scope.searchResults = [];
+                $scope.query = "";
+
+                $scope.quickSearch = function() {
+                    if ($scope.query.length === 0) {
+                        $scope.searchResults = [];
+                        return;
+                    }
+
+                    $.ajax({
+                            type: "GET",
+                            url: "/MyCabynet/ProcessGetFiles?query=" + $scope.query,
+                            async: false
+                        })
+                        .success(function(data) {
+                            if (data.Status === true) {
+                                $scope.searchResults = data.Data;
+
+                                if (data.Data === null) {
+                                    window.notyDisplay('', 'No Matching Records', 'warning');
+                                }
+
+                                if (data.Data.length === 0) {
+                                    window.notyDisplay('', 'No Matching Records', 'warning');
+                                }
+                            } else {
+                                window.notyDisplay('', 'An error has occured. Please contact support', 'error');
+                            }
+                        })
+                        .error(function(data) {
+                            window.notyEx();
+                        });
+                }
+
+                $scope.loadFile = function(searchResult) {
+                    $('#pdfDisplayObject').prop("title", searchResult.FileNameSource);
+                    $('#pdfModalHead').text("Display File: " + searchResult.FileNameSource);
+
+                    $('#pdfDisplayObject').prop("src",
+                        '/CabynetProDataArchive/Store/' +
+                        searchResult.FileNameSystem +
+                        '#toolbar=0&navpanes=0&scrollbar=0');
+                }
+
+                $scope.loadResult = function(searchResult) {
+                    $scope.searchResult = searchResult;
+                }
+            });
+    </script>
+}

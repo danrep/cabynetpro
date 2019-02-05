@@ -1,0 +1,272 @@
+﻿@using CabynetPro.EnumLibrary
+@using CabynetPro.EnumLibrary.Dictionary
+@using CabynetPro.Web.Models
+
+@{
+    /**/
+
+    ViewBag.Title = "Data Upload";
+    ViewBag.TitleDesc = "Upload Data Files for Archiving";
+    Layout = "~/Views/Shared/_ApplicationLayout.cshtml";
+}
+
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3>File Archive</h3>
+            <span>Manifest of all processed Files</span>
+        </div>
+        <div class="btn-group pull-right">
+            <button class="btn btn-default" data-toggle="modal" data-target="#uploadDoc"><span class="fa fa-plus"></span> Upload to Archive</button>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table id="archiveInformation" class="table table-responsive table-condensed table-hover">
+                <thead>
+                    <tr>
+                        <th>Date Uploaded</th>
+                        <th>File Name</th>
+                        <th>File Size (bytes)</th>
+                        <th>Control</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="uploadDoc" tabindex="-1" role="dialog" aria-labelledby="uploadDocHead" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h5 class="modal-title" id="uploadDocHead">Upload Data</h5>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-4 col-xs-12">
+                    <div class="panel panel-info">
+                        <div class="panel-body">
+                            <h4>Fill the data on the left and upload on the right!</h4>
+                            <form role="form" class="form-material">
+                                <div class="form-group">
+                                    <input type="email" class="form-control" id="txtFileDescription" required>
+                                    <span class="form-bar"></span>
+                                    <label for="txtFileDescription">Describe the File(s)</label>
+                                </div>
+                                <div class="form-group">
+                                    <select class="form-control" id="txtFileCategory" required>
+                                        <option value="0">Uncategorized</option>
+                                        @foreach (var item in EnumDictionary.GetList<FileCategory>().OrderBy(x => x.ItemName).ToList())
+                                        {
+                                            <option value="@item.ItemId">@item.ItemName</option>
+                                        }
+                                    </select>
+                                    <span class="form-bar"></span>
+                                    <label for="txtFileCategory">Select a File Category</label>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8 col-xs-12">
+                    <div class="panel panel-success">
+                        <div class="panel-body">
+                            <form action="@Url.Action("ProcessDumpFile", "Archive")" class="dropzone" method="post" enctype="multipart/form-data" id="dropzone"> </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="processFilesRequest()">Process Files</button>
+                <button type="button" class="btn btn-warning" onclick="clearQueue()">Clear Queue</button>
+                <button type="button" class="btn btn-danger" onclick="terminateQueue()">Terminate Upload</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@RenderPage("../Shared/ModalPdfView.cshtml")
+
+@section Scripts{
+    <script>
+        cabynet.controller('cabynetCtrlr',
+            function ($scope) {
+            });
+
+        function loadArchive() {
+            window.notyDisplay('', 'Loading ...', 'warning');
+            $("#archiveInformation tbody tr").remove();
+
+            $.ajax({
+                type: "GET",
+                url: "/Archive/ProcessGetFiles",
+                async: false
+            })
+                .success(function (data) {
+                    if (data.Status === true) {
+
+                        $.each(data.Data,
+                            function (i, datum) {
+                                var rowData = '<tr title="' + datum.FileNameSource + '"><td>' + window.formatDate(datum.DateCreated) + '</td>';
+
+                                if (datum.FileNameSource.length > 20)
+                                    rowData += '<td>' + datum.FileNameSource.substr(0, 20) + '<strong>...</strong></td>';
+                                else
+                                    rowData += '<td>' + datum.FileNameSource + '</td>';
+
+                                rowData += '<td>' + datum.FileSize + '</td>';
+                                rowData += '<td><div class="btn-group">';
+                                /*
+                                rowData += '<button onclick="loadDocFromTableToShare(\'' +
+                                    datum.Id +
+                                    '\', \'' +
+                                    datum.FileNameSource +
+                                    '\')" class="btn btn-sm btn-default btn-condensed" data-toggle="modal" data-target="#shareModal"><span class="fa fa-share"></span> Share</button>';
+                                    */
+                                rowData += '<button onclick="loadDocFromTable(\'' +
+                                    datum.FileNameSource +
+                                    '\', \'' +
+                                    datum.FileNameSystem +
+                                    '\')" class="btn btn-sm btn-info btn-condensed" data-toggle="modal" data-target="#pdfModal"><span class="fa fa-eye"></span> View</button>';
+                                rowData += '<button onclick="removeFileFromArchive(\'' +
+                                    datum.Id +
+                                    '\', \'' +
+                                    datum.FileNameSource +
+                                    '\')" class="btn btn-danger btn-condensed btn-sm"><span class="fa fa-trash"></span> Delete</button>';
+                                rowData += '</div></td>';
+                                rowData += '</tr>';
+
+                                $("#archiveInformation tbody").append(rowData);
+                            });
+
+                        $("#archiveInformation").dataTable();
+                        window.notyDisplay('', 'All Done', 'success');
+                    } else {
+                        window.notyDisplay('', data.Message, 'warning');
+                    }
+                })
+                .error(function (data) {
+                    window.notyEx();
+                });
+        };
+
+        loadArchive();
+
+        function removeFileFromArchive(id, fileName) {
+            var deleteApiCall = "/Archive/ProcessDeleteFile?fileInformationId=" + id;
+            window.notyConfirmApiCall(deleteApiCall,
+                'Are you sure you wish to Delete this File ' + fileName,
+                loadArchive);
+        };
+
+        Dropzone.options.dropzone = {
+            maxFiles: 20,
+            maxFilesize: 50,
+            acceptedFiles: ".pdf",
+            createImageThumbnails: true,
+            init: function () {
+                this.on("maxfilesexceeded",
+                    function (data) {
+                        window.notyDisplay('',
+                            'Too many files has been uploaded. Please Referesh this Page',
+                            'warning');
+                    });
+                this.on("success",
+                    function (file) {
+                        var _this = this;
+                    });
+                this.on("addedfile",
+                    function (file) {
+                        var removeButton = Dropzone.createElement(
+                            "<button class='btn btn-block btn-sm btn-danger'><i class='fa fa-trash'></i> Remove File</button>");
+
+                        var _this = this;
+
+                        removeButton.addEventListener("click",
+                            function (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                window.notyDisplay('', 'File has been Removed', 'warning');
+                                _this.removeFile(file);
+                            });
+
+                        file.previewElement.appendChild(removeButton);
+                    });
+            }
+        };
+
+        function processFilesRequest() {
+            if (Dropzone.forElement("#dropzone").getUploadingFiles().length > 0) {
+                window.notyDisplay('',
+                    'Files are still uploading. Please wait',
+                    'warning');
+                return;
+            }
+
+            var readyFiles = [];
+
+            $.each(Dropzone.forElement("#dropzone").getAcceptedFiles(),
+                function (i, currentFile) {
+                    readyFiles.push(currentFile.name);
+                });
+
+            if (readyFiles.length === 0) {
+                window.notyDisplay('',
+                    'You need to have uploaded at least 1 file to perform this task!',
+                    'warning');
+                return;
+            }
+
+            if ($('#txtFileDescription').val() === "") {
+                window.notyDisplay('', "A description for this file is required!", 'warning');
+                return;
+            }
+
+            const postData = {
+                Files: readyFiles,
+                Description: $('#txtFileDescription').val(),
+                Category: $('#txtFileCategory').val()
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/Archive/ProcessSaveFiles",
+                async: false,
+                data: postData,
+                dataType: "json"
+            })
+                .success(function (data) {
+                    if (data.Status === true) {
+                        window.notyDisplay('', 'All Done', 'success');
+                        clearQueue();
+                        loadArchive();
+                    } else {
+                        window.notyDisplay('', data.Message, 'warning');
+                    }
+                })
+                .error(function (data) {
+                    window.notyEx();
+                });
+        }
+
+        function clearQueue() {
+            Dropzone.forElement("#dropzone").removeAllFiles();
+            $('#txtFileDescription').val('');
+            $('#txtFileCategory').val(0);
+        }
+
+        function terminateQueue() {
+            Dropzone.forElement("#dropzone").removeAllFiles(true);
+        }
+
+        function loadDocFromTable(realName, storageName) {
+            $('#pdfDisplayObject').prop("title", realName);
+            $('#pdfModalHead').text("Display File: " + realName);
+
+            $('#pdfDisplayObject').prop("src", '/CabynetProDataArchive/Store/' + storageName + '#toolbar=0&navpanes=0&scrollbar=0');
+        };
+    </script>
+}
