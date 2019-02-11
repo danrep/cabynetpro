@@ -29,5 +29,6 @@ namespace CabynetPro.Web
         public virtual DbSet<FileAuditLog> FileAuditLogs { get; set; }
         public virtual DbSet<FileInformation> FileInformations { get; set; }
         public virtual DbSet<FolderInformation> FolderInformations { get; set; }
+        public virtual DbSet<CredentialMap> CredentialMaps { get; set; }
     }
 }

@@ -53,6 +53,8 @@
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.Services.Client" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
@@ -368,11 +370,16 @@
     <Compile Include="Controllers\ConfigurationController.cs" />
     <Compile Include="Controllers\MyCabynetController.cs" />
     <Compile Include="Controllers\SecurityController.cs" />
+    <Compile Include="Controllers\UserManagementController.cs" />
     <Compile Include="Controllers\WebNotificationController.cs" />
     <Compile Include="Credential.cs">
       <DependentUpon>CabynetProDataModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="CredentialMap.cs">
+      <DependentUpon>CabynetProDataModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Engines\AuditManager.cs" />
+    <Compile Include="Engines\Messenger.cs" />
     <Compile Include="Engines\SearchManager.cs" />
     <Compile Include="FileAuditLog.cs">
       <DependentUpon>CabynetProDataModel.tt</DependentUpon>
@@ -422,6 +429,11 @@
     <Content Include="Views\Archive\DataUpload.cshtml" />
     <Content Include="Views\Shared\ModalPdfView.cshtml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <Content Include="Views\UserManagement\AddUser.cshtml" />
+    <Content Include="Views\UserManagement\EditUser.cshtml" />
+    <Content Include="Views\UserManagement\Index.cshtml" />
+    <Content Include="Views\UserManagement\ManageUser.cshtml" />
+    <Content Include="Views\Security\MailTemplate.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

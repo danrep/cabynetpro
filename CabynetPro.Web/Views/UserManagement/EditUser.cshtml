@@ -1,0 +1,126 @@
+﻿@using CabynetPro.EnumLibrary
+@using CabynetPro.EnumLibrary.Dictionary
+@{
+    ViewBag.Title = "Edit User: " + @Model.Username;
+    Layout = "~/Views/Shared/_ApplicationLayout.cshtml";
+
+    var roleName = "";
+
+    var entity = new Entities();
+    int id = Model.Id;
+    var map = entity.CredentialMaps.FirstOrDefault(x => !x.IsDeleted && x.CredentialId == id);
+    roleName = ((UserRoles)(map?.RoleId ?? (int)UserRoles.Staff)).DisplayName();
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <form id="validate" role="form" class="form-horizontal" action="javascript:editUserForm();">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h3>User Information</h3>
+                    <h4>Current Role: @roleName</h4>
+                    <div class="form-group">
+                        <label class="col-md-3 col-xs-12 control-label">Username:</label>
+                        <div class="col-md-6 col-xs-12">
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="fa fa-envelope"></span></span>
+                                <input type="email" id="username" class="validate[required,minSize[6]] form-control" disabled="disabled" value="@Model.Username" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-xs-12 control-label">Surname:</label>
+                        <div class="col-md-6 col-xs-12">
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="fa fa-user"></span></span>
+                                <input type="text" id="lastname" class="validate[required,minSize[5]] form-control" value="@Model.Surname" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-xs-12 control-label">Other Names:</label>
+                        <div class="col-md-6 col-xs-12">
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="fa fa-user"></span></span>
+                                <input type="text" id="firstname" class="validate[required,minSize[5]] form-control" value="@Model.OtherNames" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 col-xs-12 control-label">Select</label>
+                        <div class="col-md-6 col-xs-12">
+                            <select class="form-control select validate[required]" id="userRole">
+                                <option value="0">- Select a Role -</option>
+                                @foreach (var role in EnumDictionary.GetList<UserRoles>().OrderBy(x => x.ItemName))
+                                {
+                                    <option value="@role.ItemId">@role.ItemName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <div class="btn-group pull-right">
+                                    <a class="btn btn-warning" href="@Url.Action("Index", "UserManagement")">Go Back</a>
+                                    <button class="btn btn-primary" type="submit">Update User</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        cabynet.controller('cabynetCtrlr', function ($scope) {
+
+            $scope.editUser = function () {
+
+                if ($('#userRole').val() === "0") {
+                    window.notyDisplay('', 'Please Select a Role', 'warning');
+                    $('#userRole').focus();
+                    return;
+                }
+
+                var userInformation = {
+                    Username: $('#username').val(),
+                    Surname: $('#firstname').val(),
+                    OtherNames: $('#lastname').val(),
+                    UserRoles: $('#userRole').val()
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "/UserManagement/UpdateUser",
+                    async: false,
+                    data: userInformation
+                })
+                    .success(function (data) {
+                        if (data.Status === true) {
+                            window.notyDisplay('', data.Message, 'success');
+
+                            $('#username').val('');
+                            $('#firstname').val('');
+                            $('#lastname').val('');
+                            $('#userRole').val(0);
+                        } else {
+                            window.notyDisplay('', data.Message, 'warning');
+                        }
+                    })
+                    .error(function (data) {
+                        window.notyEx();
+                    });
+            };
+        });
+
+        function editUserForm() {
+            getNgScope().editUser();
+        };
+    </script>
+}

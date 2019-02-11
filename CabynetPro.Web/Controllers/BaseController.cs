@@ -19,14 +19,14 @@ namespace CabynetPro.Web.Controllers
                     return;
                 }
 
-                if (UserInformation.UserInformationCredential.UserState == (int)UserStates.New)
-                {
-                    if (filterContext.ActionDescriptor.ActionName != "MyProfile")
-                    {
-                        filterContext.Result = RedirectToAction("MyProfile", "MyCabynet", new { area = "" });
-                        return;
-                    }
-                }
+                //if (UserInformation.UserInformationCredential.UserState == (int)UserStates.New)
+                //{
+                //    if (filterContext.ActionDescriptor.ActionName != "MyProfile")
+                //    {
+                //        filterContext.Result = RedirectToAction("MyProfile", "MyCabynet", new { area = "" });
+                //        return;
+                //    }
+                //}
 
                 var area = filterContext.RouteData.DataTokens["area"]?.ToString() ?? "";
                 if (!string.IsNullOrEmpty(area))

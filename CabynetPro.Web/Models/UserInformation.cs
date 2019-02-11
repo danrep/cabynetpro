@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Web;
 using CabynetPro.Core.Utility;
 using CabynetPro.EnumLibrary;
@@ -13,7 +14,15 @@ namespace CabynetPro.Web.Models
             try
             {
                 HttpContext.Current.Session["UserData"] = userData;
-                Role = (UserRoles)userData.UserRoles;
+                using (var entities = new Entities())
+                {
+                    var userMap = entities.CredentialMaps.FirstOrDefault(x => x.CredentialId == userData.Id && !x.IsDeleted);
+
+                    if(userMap != null)
+                        Role = (UserRoles)userMap.RoleId;
+                    else
+                        Role = UserRoles.Staff;
+                }
             }
             catch (Exception e)
             {

@@ -15,6 +15,11 @@ namespace CabynetPro.Web.Controllers
             return View();
         }
 
+        public ActionResult MailTemplate()
+        {
+            return View();
+        }
+
         public JsonResult LogInProcess(string username, string password)
         {
             try

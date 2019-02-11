@@ -9,6 +9,7 @@
         <EntityTypeShape EntityType="CabynetPro.DatabaseModel.FileAuditLog" Width="1.5" PointX="2.75" PointY="0.75" />
         <EntityTypeShape EntityType="CabynetPro.DatabaseModel.FileInformation" Width="1.5" PointX="2.75" PointY="3.75" />
         <EntityTypeShape EntityType="CabynetPro.DatabaseModel.FolderInformation" Width="1.5" PointX="4.75" PointY="0.75" />
+        <EntityTypeShape EntityType="CabynetPro.DatabaseModel.CredentialMap" Width="1.5" PointX="5.375" PointY="4.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

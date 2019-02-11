@@ -21,6 +21,16 @@
           <Property Name="DateCreated" Type="datetime" Nullable="false" />
           <Property Name="IsDeleted" Type="bit" Nullable="false" />
         </EntityType>
+        <EntityType Name="CredentialMap">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CredentialId" Type="int" Nullable="false" />
+          <Property Name="RoleId" Type="int" Nullable="false" />
+          <Property Name="IsDeleted" Type="bit" Nullable="false" />
+          <Property Name="DateAssigned" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="FileAuditLog">
           <Key>
             <PropertyRef Name="Id" />
@@ -64,6 +74,7 @@
         </EntityType>
         <EntityContainer Name="CabynetProDatabaseModelStoreContainer">
           <EntitySet Name="Credential" EntityType="Self.Credential" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CredentialMap" EntityType="Self.CredentialMap" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FileAuditLog" EntityType="Self.FileAuditLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FileInformation" EntityType="Self.FileInformation" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FolderInformation" EntityType="Self.FolderInformation" Schema="dbo" store:Type="Tables" />
@@ -77,6 +88,7 @@
           <EntitySet Name="FileAuditLogs" EntityType="CabynetPro.DatabaseModel.FileAuditLog" />
           <EntitySet Name="FileInformations" EntityType="CabynetPro.DatabaseModel.FileInformation" />
           <EntitySet Name="FolderInformations" EntityType="CabynetPro.DatabaseModel.FolderInformation" />
+          <EntitySet Name="CredentialMaps" EntityType="CabynetPro.DatabaseModel.CredentialMap" />
         </EntityContainer>
         <EntityType Name="Credential">
           <Key>
@@ -134,6 +146,16 @@
           <Property Name="FolderDescription" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="false" />
           <Property Name="ParentFolderId" Type="Int64" Nullable="false" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="CredentialMap">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CredentialId" Type="Int32" Nullable="false" />
+          <Property Name="RoleId" Type="Int32" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <Property Name="DateAssigned" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -198,6 +220,17 @@
                 <ScalarProperty Name="FolderName" ColumnName="FolderName" />
                 <ScalarProperty Name="UserCreated" ColumnName="UserCreated" />
                 <ScalarProperty Name="DateCreated" ColumnName="DateCreated" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CredentialMaps">
+            <EntityTypeMapping TypeName="CabynetPro.DatabaseModel.CredentialMap">
+              <MappingFragment StoreEntitySet="CredentialMap">
+                <ScalarProperty Name="DateAssigned" ColumnName="DateAssigned" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="CredentialId" ColumnName="CredentialId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

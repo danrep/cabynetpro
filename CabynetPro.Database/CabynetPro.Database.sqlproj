@@ -57,8 +57,17 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CabynetPro.Database.publish.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\FolderInformation.sql" />
+    <Build Include="dbo\Tables\FileInformation.sql" />
+    <Build Include="dbo\Tables\FileAuditLog.sql" />
+    <Build Include="dbo\Tables\CredentialMap.sql" />
+    <Build Include="dbo\Tables\Credential.sql" />
   </ItemGroup>
 </Project>

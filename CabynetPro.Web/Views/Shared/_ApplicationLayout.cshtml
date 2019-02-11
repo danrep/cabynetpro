@@ -65,52 +65,60 @@
                     <li>
                         <a href="@Url.Action("Index", "MyCabynet", new {area = ""})"><span class="fa fa-home"></span> <span class="xn-text">Home</span></a>
                     </li>
-                    @*
-
-                        @if (UserInformation.Role == UserRoles.SystemAdministrator)
-                        {
-                            <li class="xn-openable">
-                                <a href="#"><span class="fa fa-cogs"></span> <span class="xn-text">Configuration</span></a>
-                                <ul>
-                                    <li>
-                                        <a href="@Url.Action("Index", "Configuration", new {area = ""})"><span class="fa fa-database"></span>Data Configuration</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                    *@
-                    <li class="xn-openable">
-                        <a href="#"><span class="fa fa-archive"></span> <span class="xn-text">Data Archives</span></a>
-                        <ul>
-                            <li>
-                                <a href="@Url.Action("Index", "Archive", new {area = ""})"><span class="fa fa-dashboard"></span>Overview</a>
-                            </li>
-                            <li>
-                                <a href="@Url.Action("DataUpload", "Archive", new {area = ""})"><span class="fa fa-upload"></span>Data Upload</a>
-                            </li>
-                        </ul>
-                    </li>
-                    @*<li class="xn-openable">
-                            <a href="#"><span class="fa fa-briefcase"></span> <span class="xn-text">Electronic Administration</span></a>
+                    @if (UserInformation.Role == UserRoles.DataAdministrator)
+                    {
+                        <li class="xn-openable">
+                            <a href="#"><span class="fa fa-archive"></span> <span class="xn-text">Data Archives</span></a>
                             <ul>
                                 <li>
-                                    <a href="@Url.Action("Index", "ElectAdmin", new {area = ""})"><span class="fa fa-dashboard"></span>Overview</a>
+                                    <a href="@Url.Action("Index", "Archive", new {area = ""})"><span class="fa fa-dashboard"></span>Overview</a>
                                 </li>
-                                <li class="xn-openable">
-                                    <a href="#"><span class="fa fa-briefcase"></span> <span class="xn-text">Electronic Administration</span></a>
-                                    <ul>
-                                        <li>
-                                            <a href="@Url.Action("EProcessingHard", "ElectAdmin", new {area = ""})"><span class="fa fa-files-o"></span>Hard Copy Electronic Processing</a>
-                                        </li>
-                                    </ul>
-                                    <ul>
-                                        <li>
-                                            <a href="@Url.Action("ActionRequiredHard", "ElectAdmin", new {area = ""})"><span class="fa fa-diamond"></span>Action Required <span style="display: none" id="callToActionCountLabel" class="label label-success"></span></a>
-                                        </li>
-                                    </ul>
+                                <li>
+                                    <a href="@Url.Action("DataUpload", "Archive", new {area = ""})"><span class="fa fa-upload"></span>Data Upload</a>
                                 </li>
                             </ul>
-                        </li>*@
+                        </li>
+                    }
+
+                    @if (UserInformation.Role == UserRoles.SystemAdministrator)
+                    {
+                        <li class="xn-title">System Administration</li>
+                        <li>
+                            <a href="@Url.Action("Index", "UserManagement", new {area = ""})"><span class="fa fa-users"></span>User Management</a>
+                        </li>
+                        @*
+
+                        <li class="xn-openable">
+                            <a href="#"><span class="fa fa-cogs"></span> <span class="xn-text">Configuration</span></a>
+                            <ul>
+                                <li>
+                                    <a href="@Url.Action("Index", "Configuration", new {area = ""})"><span class="fa fa-database"></span>Data Configuration</a>
+                                </li>
+                            </ul>
+                        </li>
+                            *@
+                    }
+                    @*<li class="xn-openable">
+            <a href="#"><span class="fa fa-briefcase"></span> <span class="xn-text">Electronic Administration</span></a>
+            <ul>
+                <li>
+                    <a href="@Url.Action("Index", "ElectAdmin", new {area = ""})"><span class="fa fa-dashboard"></span>Overview</a>
+                </li>
+                <li class="xn-openable">
+                    <a href="#"><span class="fa fa-briefcase"></span> <span class="xn-text">Electronic Administration</span></a>
+                    <ul>
+                        <li>
+                            <a href="@Url.Action("EProcessingHard", "ElectAdmin", new {area = ""})"><span class="fa fa-files-o"></span>Hard Copy Electronic Processing</a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            <a href="@Url.Action("ActionRequiredHard", "ElectAdmin", new {area = ""})"><span class="fa fa-diamond"></span>Action Required <span style="display: none" id="callToActionCountLabel" class="label label-success"></span></a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>*@
                 </ul>
             </div>
             <div class="page-content">
@@ -122,7 +130,10 @@
                     <li class="xn-icon-button pull-right last">
                         <a href="#"><span class="fa fa-power-off"></span></a>
                         <ul class="xn-drop-left animated zoomIn">
-                            <li><a href="@Url.Action("MyProfile", "MyCabynet", new {area = ""})"><span class="fa fa-lock"></span> Change Password</a></li>
+                            <!--
+    <li><a href="@Url.Action("MyProfile", "MyCabynet", new {area = ""})"><span class="fa fa-lock"></span> Change Password</a></li>
+    -->
+
                             <li><a href="#" class="mb-control" data-box="#mb-signout"><span class="fa fa-sign-out"></span> Sign Out</a></li>
                         </ul>
                     </li>

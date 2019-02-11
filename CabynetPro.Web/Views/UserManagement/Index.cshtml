@@ -1,0 +1,104 @@
+﻿
+@{
+    ViewBag.Title = "User Data Overview";
+    ViewBag.TitleDesc = "Create Users for the System";
+    Layout = "~/Views/Shared/_ApplicationLayout.cshtml";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">Configured Users</h4>
+        <div class="btn-group pull-right">
+            <a href="@Url.Action("AddUser", "UserManagement")" class="btn btn-info"><span class="fa fa-user-plus"></span> Add New User</a>
+            <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bars"></i> Export Data</button>
+            <ul class="dropdown-menu">
+                <li><a href="#" onClick="$('#userInformation').tableExport({ type: 'excel', escape: 'false' });"><img src='/ViewElements/img/icons/xls.png' width="24" alt="" /> XLS</a></li>
+                <li><a href="#" onClick="$('#userInformation').tableExport({ type: 'pdf', escape: 'false' });"><img src='/ViewElements/img/icons/pdf.png' width="24" alt="" /> PDF</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table id="userInformation" class="table table-responsive">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Surname</th>
+                        <th>Othernames</th>
+                        <th>Control</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        cabynet.controller('cabynetCtrlr', function ($scope) {
+        });
+
+        function loadUsers() {
+            window.notyDisplay('', 'Loading ...', 'warning');
+            $("#userInformation tbody tr").remove();
+
+            $.ajax({
+                type: "GET",
+                url: "/UserManagement/GetUsers",
+                async: false
+            })
+                .success(function (data) {
+                    if (data.Status === true) {
+
+                        $.each(data.Data, function (i, datum) {
+                            var rowData = '<tr><td>' + datum.UserInfo.Username + '</td>';
+                            rowData += '<td>' + datum.UserRole + '</td>';
+                            rowData += '<td>' + datum.UserInfo.Surname + '</td>';
+                            rowData += '<td>' + datum.UserInfo.OtherNames + '</td>';
+                            rowData += '<td><div class="btn-group">';
+
+                            //if (datum.UserInfo.UserState === 0)
+                            //    rowData += '<button disabled="disabled" class="btn btn-primary btn-condensed btn-sm"><span class="fa fa-user-secret"></span></button>';
+                            //else
+                            //    rowData += '<button onclick="manageUserCredential(\'' + datum.UserInfo.Username + '\')" class="btn btn-primary btn-condensed btn-sm"><span class="fa fa-user-secret"></span></button>';
+
+                            rowData += '<button onclick="editUserCredential(\'' + datum.UserInfo.Username + '\')" class="btn btn-warning btn-condensed btn-sm"><span class="fa fa-pencil"></span></button>';
+                            rowData += '<button onclick="sendUserCredential(\'' + datum.UserInfo.Username + '\')" class="btn btn-info btn-condensed btn-sm"><span class="fa fa-envelope"></span></button>';
+                            rowData += '<button onclick="deleteUserCredential(\'' + datum.UserInfo.Username + '\')" class="btn btn-danger btn-condensed btn-sm"><span class="fa fa-trash"></span></button>';
+                            rowData += '</div></td>';
+                            rowData += '</tr>';
+
+                            $("#userInformation tbody").append(rowData);
+                        });
+
+                        $("#userInformation").dataTable();
+                        window.notyDisplay('', 'All Done', 'success');
+                    } else {
+                        window.notyDisplay('', data.Message, 'warning');
+                    }
+                })
+                .error(function (data) {
+                    window.notyEx();
+                });
+        };
+        loadUsers();
+
+        function editUserCredential(username) {
+            var redirection = "@Url.Action("EditUser", "UserManagement")?username=" + username;
+            window.notyConfirmRedirect(redirection);
+        };
+
+        function sendUserCredential(username) {
+            var deleteApiCall = "/UserManagement/SendUserCredentials?username=" + username;
+            window.notyConfirmApiCall(deleteApiCall, 'Are you sure you wish to Re-Send Credentials to ' + username, loadUsers);
+        };
+
+        function deleteUserCredential(username) {
+            var deleteApiCall = "/UserManagement/DeleteUser?username=" + username;
+            window.notyConfirmApiCall(deleteApiCall, 'Are you sure you wish to Delete user ' + username, loadUsers);
+        };
+    </script>
+}
