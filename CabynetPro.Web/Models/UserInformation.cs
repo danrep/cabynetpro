@@ -21,7 +21,9 @@ namespace CabynetPro.Web.Models
                     if(userMap != null)
                         Role = (UserRoles)userMap.RoleId;
                     else
-                        Role = UserRoles.Staff;
+                    {
+                        Role = userData.Id == 0 ? UserRoles.SystemAdministrator : UserRoles.Staff;
+                    }
                 }
             }
             catch (Exception e)

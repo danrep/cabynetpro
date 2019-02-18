@@ -41,6 +41,7 @@ namespace CabynetPro.Web.Controllers
                         UserState = (int) UserStates.Active,
                         Username = username
                     });
+
                     return new JsonResult()
                     {
                         Data =
